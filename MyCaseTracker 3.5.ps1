@@ -164,6 +164,7 @@ function Get-ProfilePath {
         }
     }
     else{
+        # Modify custom path here with $keeplocal set to $true.
         $profilepath = "C:\Users\$env:USERNAME"
     }
 
