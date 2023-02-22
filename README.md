@@ -6,13 +6,13 @@
 
 
 
-**How to use:**
+## How to use:
 
 Right click->Run with Powershell
 
 
 
-**How to switch CSV on Local/OneDrive path:**
+## How to switch CSV on Local/OneDrive path:
 
 Change `$KeepLocal` to `$true` or `$false` under **variables** block
 
@@ -22,7 +22,7 @@ Change `$KeepLocal` to `$true` or `$false` under **variables** block
 
 
 
-**Where is CSV stored?**
+## Where is CSV stored?
 
 By default, the CSV is stored on **Documents** folder
 
@@ -30,7 +30,7 @@ By default, the CSV is stored on **Documents** folder
 
 
 
-**What if I want change the name of CSV? **
+## What if I want change the name of CSV?
 
 Change `$Filename`line to  under **variables** block
 
@@ -40,7 +40,7 @@ $Filename = <custom_csv_name>
 
 
 
-**What if I want change the CSV to custom path? **
+## What if I want change the CSV to custom path?
 
 1.  Set`$KeepLocal` to $true under **variables** block
 
