@@ -24,11 +24,11 @@ $target = 35
 
 
 
-
-
 ## How to Switch CSV on Local/OneDrive path:
 
 Change `$KeepLocal` to `$true` or `$false` under **variables** block
+
+> by default is false, script will automatically find OneDrive path and locate if possible.
 
 ```powershell
 [Bool]$KeepLocal = $false
@@ -54,7 +54,7 @@ $Filename = <custom_csv_name>
 
 
 
-## What if I want change the CSV to custom path?
+## What if I Want Change the CSV to Custom Path?
 
 1.  Set`$KeepLocal` to $true under **variables** block
 
