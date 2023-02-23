@@ -6,13 +6,27 @@
 
 
 
-## How to use:
+## How to Use:
 
 Right click->Run with Powershell
 
 
 
-## How to switch CSV on Local/OneDrive path:
+## How to Change Daily Target:
+
+Modify`$target` to under **variables** block
+
+> by default daily target is 35 
+
+```powershell
+$target = 35
+```
+
+
+
+
+
+## How to Switch CSV on Local/OneDrive path:
 
 Change `$KeepLocal` to `$true` or `$false` under **variables** block
 
@@ -22,7 +36,7 @@ Change `$KeepLocal` to `$true` or `$false` under **variables** block
 
 
 
-## Where is CSV stored?
+## Where is CSV Stored?
 
 By default, the CSV is stored on **Documents** folder
 
@@ -30,7 +44,7 @@ By default, the CSV is stored on **Documents** folder
 
 
 
-## What if I want change the name of CSV?
+## What if I Want Change The Name of CSV?
 
 Change `$Filename`line to  under **variables** block
 
