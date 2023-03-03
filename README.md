@@ -7,9 +7,11 @@
 
 
 
-## The difference between My CaseTracker  and My Case Tracker Rating
+## The difference between My Case Tracker  and My Case Tracker Rating
 
 > Select script based on your need
+>
+> :warning:Script may have potential bug that cause CSV data loss, I'd recommend you to store CSV with OneDrive or backup CSV regularly to keep data more secure
 
 - **My Case Tracker** 
 
