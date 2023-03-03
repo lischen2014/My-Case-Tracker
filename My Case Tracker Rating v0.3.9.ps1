@@ -87,7 +87,7 @@ function Show-Menu{
     Write-Host "3: Press '3' to change an existing case rating"
     Write-Host "4: Press '4' to view daily history."
     Write-Host "5: Press '5' to view monthly history."
-    Write-Host "7: Press '7' to view all history."
+    Write-Host "7: Press '6' to view all history."
     Write-Host "8: Press '8' to open CSV folder via file explorer."
     Write-Host "9: Press '9' to view update log."
     Write-Host "Q: Press 'Q' to quit."
