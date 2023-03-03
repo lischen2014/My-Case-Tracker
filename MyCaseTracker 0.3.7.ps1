@@ -2,59 +2,61 @@
 Get-Variable -Exclude PWD,*Preference | Remove-Variable -EA 0
 
 #####################################################################################
-############################## UpdateLog ############################################
+############################# Update History ########################################
 #####################################################################################
-
-# Releases: https://git.build.ingka.ikea.com/LEJIA3/My-Case-Tracker
-
 
 $UpdateHistory =@"
 
 ======================================= Start =======================================
 
-    v1.0 = Initial version.
-    v1.1 = Fixed a bug in version display.
-    v1.2 = Add feature to delete last record.
-	       Separated add case tip.
-           Added test option to bulk import data.
-    v1.3 = Modified prompt message.
-    v1.4 = Added time before added message.
-    v1.5 = Shows case note in added message
-    v1.6 = Remove blank lines from csv when view data.
-           Added monthly work history
-           Renamed 'TodayWork' to 'DailyWork'.
-    v1.7 = Fixed a bug in time record.
-           Added case detail in daily/monthly work review.
-    v1.8 = Modified prompt code.
-    v1.9 = Auto detect OneDrive linked profile.
-           Selected current month as default month in Monthly history.
-    v2.0 = Modified Update History code, enhanced performance.
-    v2.1 = Add new feature of fix csv header.
-           Modified some text.
-    v2.2 = Fixed a bug in remove specific case.
-           Fixed a bug in check default path.
-           Modified some text.
-           Hide test option from main menu.
-    v2.3 = Modified add new case logic.
-    v2.4 = Fixed a bug of daily history.
-           Fixed a bug of date in monthly history.
-    v2.5 = Changed score calculation, lower chat & phone to 1.
-           Fixed a bug in Daily & monthly history.
-    V2.6 = Fixed a bug in remove empty line.
-    v2.7 = Add new feature of fix header missing.
-    v2.8 = Fixed bug in add new case.
-    v2.9 = Fixed a bug in remove empty line.
-    v3.0 = Add a feature of debug.
-           Trim input message.
-    v3.1 = Removed prompt in View-AllWork.
-    v3.2 = Add a feature of case details with GUI.
-    v3.3 = Add a feature of recognize phone as keyword.
-    v3.4 = Add support of '-' in case id.
-    v3.5 = Add a feature of auto remove line break.
-    v3.6 = Fixed a bug of wrong monthly display.
-           Changed view to percentage, default 35 for 100%.
-           Changed monthly view to average score.
+    v0.1.0 = Initial version.
+    v0.1.1 = Fixed a bug in version display.
+    v0.1.2 = Add feature to delete last record.
+	         Separated add case tip.
+             Added test option to bulk import data.
+    v0.1.3 = Modified prompt message.
+    v0.1.4 = Added time before added message.
+    v0.1.5 = Shows case note in added message
+    v0.1.6 = Remove blank lines from csv when view data.
+             Added monthly work history
+             Renamed 'TodayWork' to 'DailyWork'.
+    v0.1.7 = Fixed a bug in time record.
+             Added case detail in daily/monthly work review.
+    v0.1.8 = Modified prompt code.
+    v0.1.9 = Auto detect OneDrive linked profile.
+             Selected current month as default month in Monthly history.
+    v0.2.0 = Modified Update History code, enhanced performance.
+    v0.2.1 = Add new feature of fix csv header.
+             Modified some text.
+    v0.2.2 = Fixed a bug in remove specific case.
+             Fixed a bug in check default path.
+             Modified some text.
+             Hide test option from main menu.
+    v0.2.3 = Modified add new case logic.
+    v0.2.4 = Fixed a bug of daily history.
+             Fixed a bug of date in monthly history.
+    v0.2.5 = Changed score calculation, lower chat & phone to 1.
+             Fixed a bug in Daily & monthly history.
+    V0.2.6 = Fixed a bug in remove empty line.
+    v0.2.7 = Add new feature of fix header missing.
+    v0.2.8 = Fixed bug in add new case.
+    v0.2.9 = Fixed a bug in remove empty line.
+    v0.3.0 = Add a feature of debug.
+             Trim input message.
+    v0.3.1 = Removed prompt in View-AllWork.
+    v0.3.2 = Add a feature of case details with GUI.
+    v0.3.3 = Add a feature of recognize phone as keyword.
+    v0.3.4 = Add support of '-' in case id.
+    v0.3.5 = Add a feature of auto remove line break.
+    v0.3.6 = Fixed a bug of wrong monthly display.
+             Changed view to percentage, default 35 for 100%.
+             Changed monthly view to average score.
+    v0.3.7 = Text modification.
+             Fixed a bug in Monthly view.
+             Changed version ID, now started with 0.1.
+             Modify version check function.
            
+
     Latest Releases: 
     Releases: https://git.build.ingka.ikea.com/LEJIA3/My-Case-Tracker
 
@@ -99,7 +101,7 @@ function Start-Menu{
         Show-Menu -Title "My Case Tracker $Current_Version"
         write-host "Note. You can add a case id directly from main menu."
         Write-Host ""
-        $UserInput = ((Read-Host "Please make a selection or input a case ID").trim()) -replace "\r?\n", " "
+        $UserInput = ((Read-Host "Make selection/Input case ID").trim()) -replace "\r?\n", " "
         switch($UserInput)
         {
             '1'{
@@ -175,20 +177,17 @@ function Get-ProfilePath {
 }
 
 
-function Check-LatestVersion {
-    $RegVersion = "v[0-9]{1,2}\.\d[0-9]{0,3}"
-    $UpdateHistory_List = $UpdateHistory -split "`n"
-    $All_Vers = @()
-
-    foreach ($i in $UpdateHistory_List){
-        if ($i -match $RegVersion){
-            $All_Vers += ($matches).Values
-        }
-        $Last_Version = $All_Vers[-1]
+function Get-LatestVersionId {
+    $pattern = 'v(\d+(\.\d+){0,3})'
+    $matches = [regex]::Matches($UpdateHistory, $pattern)
+    
+    if ($matches.Count -gt 0) {
+        $latestMatch = $matches[$matches.Count - 1]
+        return $latestMatch.Groups[0].Value # 0 with v, 1 without v.
     }
-    return $Last_Version
+    
+    return $null
 }
-
 
 function Refresh-Date{
     # refresh the $date if script keep running the other day
@@ -284,7 +283,7 @@ function New-Csv{
     $NewSheet.cells.item(2,5) = 'Note'
     # Save the file
     try{
-        $NewWorkbook.SaveAs("$Filenosuffix",[Microsoft.Office.Interop.Excel.XlFileFormat]::xlCSV) # xlCSV specifies the CSV file format
+        $NewWorkbook.SaveAs("$filePath",[Microsoft.Office.Interop.Excel.XlFileFormat]::xlCSV) # xlCSV specifies the CSV file format
         write-host "CSV is created, the path is:"
         write-host $File -ForegroundColor Cyan
         Write-Warning "Do not change the CSV file path/column names, or you have to modify the path/column in scripts!"
@@ -441,7 +440,7 @@ function View-MonthlyWork{
     }
     $EndOfMonth = $StartOfMonth.AddMonths(1)
     
-    $csv = Import-Csv $File | Where-Object -FilterScript {([DateTime]::Parse($_."Date") -gt $StartOfMonth) -and ([DateTime]::Parse($_."Date") -lt $EndOfMonth)} 
+    $csv = Import-Csv $File | Where-Object -FilterScript {([DateTime]::Parse($_."Date") -ge $StartOfMonth) -and ([DateTime]::Parse($_."Date") -lt $EndOfMonth)} 
 
     # Parse data
     $MonthWork = $csv
@@ -599,10 +598,10 @@ $RegExCaseID = "^\w*[\s-]*\w*$"
 $RegExEmpty = "^,{4,}$"
 $profilepath = Get-ProfilePath
 $Filedir = "$profilepath\Documents"
-$Current_Version = Check-LatestVersion
+$Current_Version = Get-LatestVersionId
 $Filename = "MyCaseTracker"
-$Filenosuffix = $Filedir + "\" + $Filename
-$File = ("$Filenosuffix" + ".csv")
+$filePath = $Filedir + "\" + $Filename
+$File = ("$filePath" + ".csv")
 $Filexist = test-path $File
 
 
