@@ -8,9 +8,8 @@ Get-Variable -Exclude PWD,*Preference | Remove-Variable -EA 0
 $UpdateHistory =@"
 
 ======================================= Start =======================================
-
     v0.1.0 = Initial version.
-    v0.1.1 = Fixed a bug in version display.
+    v0.1.1 = Fixed version display bug.
     v0.1.2 = Add feature to delete last record.
 	         Separated add case tip.
              Added test option to bulk import data.
@@ -20,55 +19,56 @@ $UpdateHistory =@"
     v0.1.6 = Remove blank lines from csv when view data.
              Added monthly work history
              Renamed 'TodayWork' to 'DailyWork'.
-    v0.1.7 = Fixed a bug in time record.
+    v0.1.7 = Fixed a time record bug.
              Added case detail in daily/monthly work review.
     v0.1.8 = Modified prompt code.
     v0.1.9 = Auto detect OneDrive linked profile.
              Selected current month as default month in Monthly history.
     v0.2.0 = Modified Update History code, enhanced performance.
-    v0.2.1 = Add new feature of fix csv header.
+    v0.2.1 = Removed Auto Detect OneDrive.
+             Fixed a bug of Monthly history rating.
              Modified some text.
-    v0.2.2 = Fixed a bug in remove specific case.
-             Fixed a bug in check default path.
+             Add new feature of remove specific case.
+             Add new feature of fix csv header.
+             Add new feature of modify existing case rating.
+             fixed some bug in view case history.
+    v0.2.2 = Fixed a bug of check default path.
              Modified some text.
-             Hide test option from main menu.
+             Fixed a bug of remove specific case.
     v0.2.3 = Modified add new case logic.
     v0.2.4 = Fixed a bug of daily history.
              Fixed a bug of date in monthly history.
-    v0.2.5 = Changed score calculation, lower chat & phone to 1.
-             Fixed a bug in Daily & monthly history.
+    v0.2.5 = Fixed a bug in Daily & monthly history.
     V0.2.6 = Fixed a bug in remove empty line.
     v0.2.7 = Add new feature of fix header missing.
-    v0.2.8 = Fixed bug in add new case.
+             Add new feature of check case ID format.
+    v0.2.8 = Fixed bug of add new case.
     v0.2.9 = Fixed a bug in remove empty line.
     v0.3.0 = Add a feature of debug.
              Trim input message.
     v0.3.1 = Removed prompt in View-AllWork.
     v0.3.2 = Add a feature of case details with GUI.
-    v0.3.3 = Add a feature of recognize phone as keyword.
-    v0.3.4 = Add support of '-' in case id.
+    v0.3.3 = text modification
+    v0.3.4 = You can now add '-' in case id.
     v0.3.5 = Add a feature of auto remove line break.
     v0.3.6 = Fixed a bug of wrong monthly display.
-             Changed view to percentage, default 35 for 100%.
-             Changed monthly view to average score.
     v0.3.7 = Text modification.
-             Fixed a bug in Monthly view.
+             'Renamed from Daily Work' to 'Case Tracker'.
              Changed version ID, now started with 0.1.
              Modify version check function.
-    v0.3.8 = Text modification.
+    v0.3.8 = Fixed bug with call wrong function.
+             Fixed a bug of not display monthly review correctly.
+    v0.3.9 = Fixed a bug when remove case.
 
-           
 
     Latest Releases: 
     Releases: https://github.com/lischen2014/My-Case-Tracker
 
                                                    Author: Leon
                                                    Email: leon2014@vip.qq.com
-======================================== End ========================================
+======================================= End =======================================
 
 "@
-
-
 
 
 #####################################################################################
@@ -80,15 +80,15 @@ function Show-Menu{
     [string]$Title = 'Menu'
     )
     Write-Host ""
-    Write-Host "=============== $Title ==============="
+    Write-Host "================ $Title ================"
     write-host ""
     Write-Host "1: Press '1' to add a case."
-    Write-Host "2: Press '2' to remove a case."
-    Write-Host "3: Press '3' to view daily history."
-    Write-Host "4: Press '4' to view monthly history."
-    Write-Host "5: Press '5' to view all history."
-    # Write-Host "7: Press '7' to Import test data.(Test option, do not use!)"
-    Write-Host "8: Press '8' to open CSV folder from file explorer."
+    Write-Host "2: Press '2' to remove a case"
+    Write-Host "3: Press '3' to change an existing case rating"
+    Write-Host "4: Press '4' to view daily history."
+    Write-Host "5: Press '5' to view monthly history."
+    Write-Host "7: Press '7' to view all history."
+    Write-Host "8: Press '8' to open CSV folder via file explorer."
     Write-Host "9: Press '9' to view update log."
     Write-Host "Q: Press 'Q' to quit."
     Write-Host ""
@@ -102,7 +102,6 @@ function Start-Menu{
         Check2Fix-Header
         Show-Menu -Title "My Case Tracker $Current_Version"
         write-host "Note. You can add a case id directly from main menu."
-        Write-Host ""
         $UserInput = ((Read-Host "Make selection/Input case ID").trim()) -replace "\r?\n", " "
         switch($UserInput)
         {
@@ -115,25 +114,26 @@ function Start-Menu{
                 }
             
             '3'{
-                View-DailyWork
+                Change-Rating
             }
             '4'{
-                view-MonthlyWork
+                View-DailyWorkWithRating
             }
             '5'{
+                View-MonthlyWorkWithRating
+            }
+            '6'{
                 View-AllWork
             }
-            
-            # space for test option
-
             '8'{
-                # open csv file location
-                explorer $Filedir
+                # open csv
+                explorer $filedir
             }
             '9'{
                 $UpdateHistory
                 pause
             }
+            # end selection
             default{
                 Write-Host ""
                 if($UserInput.Length -gt 5){
@@ -171,7 +171,6 @@ function Get-ProfilePath {
         }
     }
     else{
-        # Modify custom path here with $keeplocal set to $true.
         $profilepath = "C:\Users\$env:USERNAME"
     }
 
@@ -180,16 +179,18 @@ function Get-ProfilePath {
 
 
 function Get-LatestVersionId {
+    
     $pattern = 'v(\d+(\.\d+){0,3})'
     $matches = [regex]::Matches($UpdateHistory, $pattern)
     
     if ($matches.Count -gt 0) {
         $latestMatch = $matches[$matches.Count - 1]
-        return $latestMatch.Groups[0].Value # 0 with v, 1 without v.
+        return $latestMatch.Groups[0].Value
     }
     
     return $null
 }
+
 
 function Refresh-Date{
     # refresh the $date if script keep running the other day
@@ -276,18 +277,19 @@ function New-Csv{
     $NewWorkbook.Styles("Normal").font.name = "Calibri"
     $NewWorkbook.Styles("Normal").font.size = 11
     [void]$NewSheet.Columns.AutoFit()
+
     # Add subject
     $NewSheet.cells.item(1,1) = '# Do not change the name of columns otherwise script may failed'
     $NewSheet.cells.item(2,1) = 'Date'
     $NewSheet.cells.item(2,2) = 'Time'
     $NewSheet.cells.item(2,3) = 'Case'
-    $NewSheet.cells.item(2,4) = 'Type'
-    $NewSheet.cells.item(2,5) = 'Note'
+    $NewSheet.cells.item(2,4) = 'Rating'
+
     # Save the file
     try{
-        $NewWorkbook.SaveAs("$filePath",[Microsoft.Office.Interop.Excel.XlFileFormat]::xlCSV) # xlCSV specifies the CSV file format
+        $NewWorkbook.SaveAs("$filenosuffix",[Microsoft.Office.Interop.Excel.XlFileFormat]::xlCSV) # xlCSV specifies the CSV file format
         write-host "CSV is created, the path is:"
-        write-host $File -ForegroundColor Cyan
+        write-host $file -ForegroundColor Cyan
         Write-Warning "Do not change the CSV file path/column names, or you have to modify the path/column in scripts!"
     }
     catch{$e}
@@ -335,38 +337,24 @@ function Add-Case{
         return
     }
 
-    # Add Type
-    if ($case.case -match "Phone"){
-        $case.type = "Phone"
-    }
-    elseif (($case.case -match "INC") -or ($case.case -match "REQ") -or ($case.case -match "RITM")){
-        $case.type = "Written"
-    }
-    elseif($case.case -match "IMS"){
-        $case.type = "Chat"
-    }
-    else{
-        $case.type = ((Read-Host "Please type case type(use written, phone or chat, default is written.)").trim()) -replace "\r?\n", " "
+    # Add Rating
+    $case.Rating = (Read-Host "[Optional] Please type case rating").trim()
+    while ($case.Rating -eq 0){
+        Write-Host "Rating cannot be 0, if you want skip please press Enter key."
+        $case.Rating = (Read-Host "[Optional] Please type case rating").trim()
     }
 
     # Add Note
-    $case.note = ((Read-Host "[Optional] Please type case additional information").trim()) -replace "\r?\n", " "
-    
-    if(!$case.type){
-        $case.type = "Written"
-    }
-
-    $case.content = $case.date, $case.time, $case.case, $case.type, $case.note -join ','
+    $case.content = $case.date, $case.time, $case.case, $case.Rating -join ','
     write-host ""
     try{
         Transmit-Case -case $case
-        if(!$case.note){
+        if(!$case.Rating){
             Write-HostWithTime -Message "Message: $($case.case) is recorded." -ForegroundColor Cyan
         }
         else{
-            Write-HostWithTime -Message "Message: $($case.case) - $($case.note) is recorded." -ForegroundColor Cyan
+            Write-HostWithTime -Message "Message: $($case.case) - $($case.Rating) is recorded." -ForegroundColor Cyan
         }
-        
     }
     catch{$e}
 }
@@ -377,55 +365,46 @@ function Transmit-Case{
         $case
     )
     foreach ($singlecase in $case.content){
-        $singlecase | add-content -path $File
+        $singlecase | add-content -path $file
     }
 }
 
 
-function View-DailyWork{
+function View-DailyWorkWithRating{
     Remove-EmptyLine
-    $csv = Import-Csv $File | Select-Object *
+    $csv = Import-Csv $file | Where-Object {([DateTime]$_.Date) -eq $date} 
 
     # Parse data
-    $TodayWork = $csv | Where-Object {([DateTime]$_.Date) -eq $date} 
+    $TodayWork = $csv
     $Today = [ordered]@{}
 
-    # Calculate how many written case received
-    $Today.WrittenDetail = $TodayWork | Where-Object {$_.type -match "Case|Written|NowIT"}
-    $Today.Written = ($Today.WrittenDetail | Measure-Object).Count
+    # Calculate how many cases closed
+    $Today.CaseDetail = $TodayWork
+    $Today.Case = ($Today.CaseDetail | Measure-Object).Count
+    
+    # Calculate rating
+    $Ratings = $TodayWork | Where-Object {$_.Rating -ne ''} | Select-Object -ExpandProperty Rating
+    $Today.Rating = ($Ratings | Measure-Object -Average).Average
+    $Today.Rating = [math]::round($Today.Rating ,2)
 
-    # Calculate how many chat case received
-    $Today.ChatDetail =$TodayWork | Where-Object {$_.Type -eq "Chat"}
-    $Today.Chat = ($Today.ChatDetail | Measure-Object).Count
-
-    # Calculate how many phone case received
-    $Today.PhoneDetail = $TodayWork | Where-Object {$_.Type -eq "Phone"}
-    $Today.Phone = ($Today.PhoneDetail | Measure-Object).Count
-    # sum, calculate the grade
-    $Today.Score = ‘{0:p1}’ -f (($Today.Written + $Today.Chat + $Today.Phone)/$target)
-
-    # Display the current data
     $TodayReview = New-Object PSObject -property @{
-        Date = $date
-        Score = $today.Score
-        Written = $today.Written
-        Chat = $today.Chat
-        Phone = $today.Phone
+        Date= $date
+        Cases= $Today.Case
+        AvgRating = $Today.Rating
     }
 
     # Summary
-    $TodayReview | Format-Table -Property Date, Score, Written, Chat, Phone -AutoSize -Wrap
-    Write-host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target"
+    $TodayReview | Format-Table -Property Date, Cases, AvgRating
     Display-Details -table $TodayWork
 }
 
 
-function View-MonthlyWork{
+function View-MonthlyWorkWithRating{
     Remove-EmptyLine
 
     # Select time range
     try {
-        $SOMUserInput = (Read-Host "Enter a month,current month by default: (Eg: 2023-01)").trim()
+        $SOMUserInput = (Read-Host "Enter a month (Eg: 2023-01)").trim()
         if(!$SOMUserInput){
             [DateTime]$StartOfMonth = (Get-Date).ToString("yyyy-MM") + "-01"
             Write-Host "No input, selected current month"
@@ -439,43 +418,31 @@ function View-MonthlyWork{
         Write-Host "Invalid time, try again." -f Red
     }
     $EndOfMonth = $StartOfMonth.AddMonths(1)
-    
-    $csv = Import-Csv $File | Where-Object -FilterScript {([DateTime]::Parse($_."Date") -ge $StartOfMonth) -and ([DateTime]::Parse($_."Date") -lt $EndOfMonth)} 
 
+    $csv = Import-Csv $file | Where-Object -FilterScript {([DateTime]::Parse($_."Date") -ge $StartOfMonth) -and ([DateTime]::Parse($_."Date") -lt $EndOfMonth)} 
+    
     # Parse data
     $MonthWork = $csv
     $Month = [ordered]@{}
-    # Calculate how many written case received
-    $Month.WrittenDetail = $MonthWork | Where-Object {$_.type -match "Case|Written|NowIT"}
-    $Month.Written = ($Month.WrittenDetail | Measure-Object).Count
 
-    # Calculate how many chat case received
-    $Month.ChatDetail =$MonthWork | Where-Object {$_.Type -eq "Chat"}
-    $Month.Chat = ($Month.ChatDetail | Measure-Object).Count
-
-    # Calculate how many phone case received
-    $Month.PhoneDetail = $MonthWork | Where-Object {$_.Type -eq "Phone"}
-    $Month.Phone = ($Month.PhoneDetail | Measure-Object).Count
-    # sum, calculate the grade
-    # $Month.Score = ‘{0:p1}’ -f (($Month.Written + $Month.Chat*1 + $Month.Phone*1)/35)
+    # Calculate how many cases closed
+    $Month.CaseDetail = $MonthWork
+    $Month.Case = ($Month.CaseDetail | Measure-Object).Count
     
-    # Calculate Average Score
-    $Month.Days = ($Monthwork.Date | Get-Unique).count
-    $Month.AvgScore = ‘{0:p1}’ -f (($Month.Written + $Month.Chat*1 + $Month.Phone*1)/$target/$Month.Days)
+    # Calculate rating
+    $Ratings = $MonthWork | Where-Object {$_.Rating -ne ''} | Select-Object -ExpandProperty Rating
+    $Month.Rating = ($ratings | Measure-Object -Average).Average
+    $Month.Rating = [math]::round($Month.Rating ,2)
 
     # Display the current data
     $MonthReview = New-Object PSObject -property @{
-        Date = ([String]$StartOfMonth).Substring(0,3)+([String]$StartOfMonth).Substring(6,4)
-        Days = $Month.Days
-        AvgScore = $Month.AvgScore
-        Written = $Month.Written
-        Chat = $Month.Chat
-        Phone = $Month.Phone
+        Date= ([String]$StartOfMonth).Substring(3,7)
+        Cases= $Month.Case
+        AvgRating = $Month.Rating
     }
 
     # Summary
-    $MonthReview | Format-Table -Property Date, Days, AvgScore, Written, Chat, Phone -AutoSize -Wrap 
-    Write-host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target/Record Days"
+    $MonthReview | Format-Table -Property Date, Cases, AvgRating
     Display-Details -table $MonthWork
 }
 
@@ -492,7 +459,7 @@ function Display-Details{
     param($table)
 
     write-host ""
-    $decision = Prompt-Confirm -action 'display work details'
+    $decision = Prompt-Confirm -action 'display daily work details'
     if ($decision -eq 'y'){
         # $table | Format-Table -AutoSize
         $table | Out-GridView
@@ -503,16 +470,9 @@ function Display-Details{
 }
 
 
-function Remove-LastLine{
-    $lines = get-content -path $File
-    $lines = $lines[0..($lines.count-2)]
-    Set-Content $File -Value $lines
-}
-
-
 function Remove-EmptyLine{
     # Remove csv empty lines and txt empty lines
-    (gc $file) | ? {($_.trim() -notmatch $RegExEmpty) -and ($_.trim() -ne "") } | Set-Content $file
+    (gc $file) | ? {($_.trim() -ne ",,,,") -and ($_.trim() -ne "") -and ($_.trim() -ne ",,,,,") } | Set-Content $file
 }
 
 
@@ -531,7 +491,7 @@ function Remove-SpecificCase{
             $CaseNeedsDelete = (read-host "please input case ID").trim()
 
             # Check if legal
-            if ($CaseNeedsDelete -match $RegExCaseID){
+            if (($CaseNeedsDelete -match $RegExCaseID) -and ($CaseNeedsDelete)){
                 [Bool]$CasePass = $true
             }
             else{
@@ -565,6 +525,41 @@ function Remove-SpecificCase{
 }
 
 
+function Change-Rating {
+    $Filecontent = Get-Content -path $file
+
+    if($Filecontent){
+        # user input a case id
+        $CaseNeedsChange = Read-Host "Please input the case ID you need to change rating"
+        $CaseRating = Read-Host "Please input the new rating"
+
+        # search and match the case
+        $OldLines = $filecontent -split "`n"
+        $NewLines = @()
+
+        foreach ($line in $OldLines){
+            if ($line -match $CaseNeedsChange){
+                $linedetails = $line -split ","
+                $linedetails[3] = $CaseRating
+                $NewLine = $linedetails -join ","
+                $line = $NewLine
+            }
+            else{
+                # no action
+            }
+            $NewLines += $line
+        }
+
+        Set-Content -Path $file -value $NewLines
+        Write-Host "Changed $CaseNeedsChange to new rating $CaseRating Success"
+    }
+    else{
+        write-host ""
+        Write-Host "Message: The CSV does not contain any records."
+    }
+}
+
+
 function Check2Fix-Header{
     $lines = get-content -path $File
 
@@ -590,27 +585,24 @@ function Check2Fix-Header{
 #####################################################################################
 ############################## Variables ############################################
 #####################################################################################
-
-[Bool]$EnabledRating = $false
-[Bool]$KeepLocal = $false
-$target = 35
+[Bool]$EnabledRating = $true
+[Bool]$KeepLocal = $true
 $RegExCaseID = "^\w*[\s-]*\w*$"
 $RegExEmpty = "^,{4,}$"
 $profilepath = Get-ProfilePath
-$Filedir = "$profilepath\Documents"
+$filedir = "$profilepath\Documents"
 $Current_Version = Get-LatestVersionId
-$Filename = "MyCaseTracker"
-$filePath = $Filedir + "\" + $Filename
-$File = ("$filePath" + ".csv")
-$Filexist = test-path $File
-
+$filename = "MyCaseTracker"
+$filenosuffix = $filedir + "\" + $filename
+$file = ("$filenosuffix" + ".csv")
+$filexist = test-path $file
 
 
 #####################################################################################
 ###################################### Main #########################################
 #####################################################################################
 
-if (!($false -ne $Filexist)){
+if (!($false -ne $filexist)){
     New-Csv
 }
 
@@ -618,9 +610,7 @@ Try{
     Start-Menu # -ErrorAction SilentlyContinue
 }
 Catch {
-    write-host ""
-    Write-Warning "Oops,seems an error occurred, please check CSV file and download the latest version of script.`n"
-    write-host "You can download latest version from here: `nhttps://git.build.ingka.ikea.com/LEJIA3/My-Case-Tracker`n"
+    Write-Warning "Oops,seems an error occurred, please check CSV file and download the latest version of script."
     $decision = Prompt-Confirm -action 'show error details?'
     if ($decision -eq 'y'){
         $ErrLine = $_.ScriptStackTrace
@@ -631,3 +621,7 @@ Catch {
 }
 
 
+
+# Reference:
+# http://woshub.com/read-write-excel-files-powershell/
+# https://stackoverflow.com/questions/59402365/update-a-cell-in-a-excel-sheet-using-powershell

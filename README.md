@@ -2,7 +2,6 @@
 
 
 
-[toc]
 
 ![image-20230223101621913](./README.assets/image-20230223101621913.png)
 
@@ -20,6 +19,8 @@
   | -------- | -------- | ------------- | ------- | ------------------- |
   | 1/1/2023 | 12:12:00 | Incident88888 | Written | Win10 Upgrade issue |
 
+  Default CSV path is set to keep on **Local**
+
   
 
 - **My Case Tracker Rating**
@@ -29,24 +30,14 @@
   | Date     | Time     | Case          | Rating  |
   | -------- | -------- | ------------- | ------- |
   | 1/1/2023 | 12:12:00 | Incident88888 | 10 |
+  
+  Default CSV path is set to keep on **OneDrive**.
 
 
 
 ## How to Use:
 
 Right click->Run with Powershell
-
-
-
-## How to Change Daily Target:
-
-> Only available in **My Case Tracker** 
-
-Modify`$target` to under **variables** block, default value:  **35** 
-
-```powershell
-$target = 35
-```
 
 
 
@@ -104,3 +95,16 @@ $Filename = <custom_csv_name>
 
 
 ![image-20230222165259511](./README.assets/image-20230222165259511.png)
+
+
+
+## How to Change Daily Target:
+
+`This feature not available in My Case Tracker Rating`
+
+Modify`$target` to under **variables** block, default value:  **35** 
+
+```powershell
+$target = 35
+```
+
