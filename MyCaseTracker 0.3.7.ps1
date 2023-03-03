@@ -55,13 +55,15 @@ $UpdateHistory =@"
              Fixed a bug in Monthly view.
              Changed version ID, now started with 0.1.
              Modify version check function.
+    v0.3.8 = Text modification.
+
            
 
     Latest Releases: 
-    Releases: https://git.build.ingka.ikea.com/LEJIA3/My-Case-Tracker
+    Releases: https://github.com/lischen2014/My-Case-Tracker
 
-                                                   Author: Leon Jiang
-                                                   Email: leon.jiang@ingka.ikea.com
+                                                   Author: Leon
+                                                   Email: leon2014@vip.qq.com
 ======================================== End ========================================
 
 "@
@@ -78,7 +80,7 @@ function Show-Menu{
     [string]$Title = 'Menu'
     )
     Write-Host ""
-    Write-Host "================ $Title ================"
+    Write-Host "=============== $Title ==============="
     write-host ""
     Write-Host "1: Press '1' to add a case."
     Write-Host "2: Press '2' to remove a case."
@@ -422,21 +424,19 @@ function View-MonthlyWork{
     Remove-EmptyLine
 
     # Select time range
-    While(1){
-        try {
-            $SOMUserInput = (Read-Host "Enter a month,current month by default: (Eg: 2023-01)").trim()
-            if(!$SOMUserInput){
-                [DateTime]$StartOfMonth = (Get-Date).ToString("yyyy-MM") + "-01"
-                Write-Host "No input, selected current month"
-            }
-            else{
-                $StartOfMonth = [DateTime]$SOMUserInput
-            }
-            break
+    try {
+        $SOMUserInput = (Read-Host "Enter a month,current month by default: (Eg: 2023-01)").trim()
+        if(!$SOMUserInput){
+            [DateTime]$StartOfMonth = (Get-Date).ToString("yyyy-MM") + "-01"
+            Write-Host "No input, selected current month"
         }
-        catch{
-            Write-Host "Invalid time, try again." -f Red
+        else{
+            $StartOfMonth = [DateTime]$SOMUserInput
         }
+        break
+    }
+    catch{
+        Write-Host "Invalid time, try again." -f Red
     }
     $EndOfMonth = $StartOfMonth.AddMonths(1)
     

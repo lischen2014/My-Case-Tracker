@@ -2,7 +2,33 @@
 
 
 
+[toc]
+
 ![image-20230223101621913](./README.assets/image-20230223101621913.png)
+
+
+
+## The difference between My CaseTracker  and My Case Tracker Rating
+
+> Select script based on your need
+
+- **My Case Tracker** 
+
+  It will generate CSV with **5** columns:
+
+  | Date     | Time     | Case          | Type    | Note                |
+  | -------- | -------- | ------------- | ------- | ------------------- |
+  | 1/1/2023 | 12:12:00 | Incident88888 | Written | Win10 Upgrade issue |
+
+  
+
+- **My Case Tracker Rating**
+
+  It will generate CSV with **4** columns:
+
+  | Date     | Time     | Case          | Rating  |
+  | -------- | -------- | ------------- | ------- |
+  | 1/1/2023 | 12:12:00 | Incident88888 | 10 |
 
 
 
@@ -14,9 +40,9 @@ Right click->Run with Powershell
 
 ## How to Change Daily Target:
 
-Modify`$target` to under **variables** block
+> Only available in **My Case Tracker** 
 
-> by default daily target is 35 
+Modify`$target` to under **variables** block, default value:  **35** 
 
 ```powershell
 $target = 35
@@ -26,9 +52,9 @@ $target = 35
 
 ## How to Switch CSV on Local/OneDrive path:
 
-Change `$KeepLocal` to `$true` or `$false` under **variables** block
+> Do not change this option after CSV is created, or it may create a new CSV.
 
-> by default is false, script will automatically find OneDrive path and locate if possible.
+Change `$KeepLocal` to `$true` or `$false` under **variables** block, default value: `$false`
 
 ```powershell
 [Bool]$KeepLocal = $false
@@ -41,6 +67,8 @@ Change `$KeepLocal` to `$true` or `$false` under **variables** block
 By default, the CSV is stored on **Documents** folder
 
 >  If OneDrive is installed, it will set with OneDrive-Documents folder
+
+You can also use the 'open CSV folder via file explorer' option to open the folder contains this CSV
 
 
 
