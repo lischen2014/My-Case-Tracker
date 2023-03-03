@@ -191,6 +191,7 @@ function Get-LatestVersionId {
     return $null
 }
 
+
 function Refresh-Date{
     # refresh the $date if script keep running the other day
     $global:date = get-date -format "MM/dd/yyyy"
@@ -433,7 +434,6 @@ function View-MonthlyWork{
         else{
             $StartOfMonth = [DateTime]$SOMUserInput
         }
-        break
     }
     catch{
         Write-Host "Invalid time, try again." -f Red

@@ -59,6 +59,7 @@ $UpdateHistory =@"
     v0.3.8 = Fixed bug with call wrong function.
              Fixed a bug of not display monthly review correctly.
     v0.3.9 = Fixed a bug when remove case.
+             Fixed a bug in monthly view.
 
 
     Latest Releases: 
@@ -412,7 +413,6 @@ function View-MonthlyWorkWithRating{
         else{
             $StartOfMonth = [DateTime]$SOMUserInput
         }
-        break
     }
     catch{
         Write-Host "Invalid time, try again." -f Red
