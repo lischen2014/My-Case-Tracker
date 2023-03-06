@@ -56,6 +56,7 @@ $UpdateHistory =@"
              Changed version ID, now started with 0.1.
              Modify version check function.
     v0.3.8 = Text modification.
+    v0.3.9 = Reduce Case Length limit to 6.
 
            
 
@@ -330,9 +331,9 @@ function Add-Case{
     }
     
     # Check Case ID length
-    if (($case.case).Length -le 7){
+    if (($case.case).Length -le 6){
         Write-Host ""
-        Write-Warning "Action failed, the length of Case ID should larger than 7."
+        Write-Warning "Action failed, the length of Case ID should larger than 6."
         return
     }
 

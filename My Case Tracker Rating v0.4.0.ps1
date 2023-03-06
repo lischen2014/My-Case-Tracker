@@ -60,6 +60,7 @@ $UpdateHistory =@"
              Fixed a bug of not display monthly review correctly.
     v0.3.9 = Fixed a bug when remove case.
              Fixed a bug in monthly view.
+    v0.4.0 = Reduce Case Length limit to 6.
 
 
     Latest Releases: 
@@ -332,9 +333,9 @@ function Add-Case{
     }
     
     # Check Case ID length
-    if (($case.case).Length -le 7){
+    if (($case.case).Length -le 6){
         Write-Host ""
-        Write-Warning "Action failed, the length of Case ID should larger than 7."
+        Write-Warning "Action failed, the length of Case ID should larger than 6."
         return
     }
 
