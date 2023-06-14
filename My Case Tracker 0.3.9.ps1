@@ -82,7 +82,7 @@ function Show-Menu{
     )
     Write-Host ""
     Write-Host "=============== $Title ==============="
-    write-host ""
+    Write-Host ""
     Write-Host "1: Press '1' to add a case."
     Write-Host "2: Press '2' to remove a case."
     Write-Host "3: Press '3' to view daily history."
@@ -102,7 +102,7 @@ function Start-Menu{
         Remove-EmptyLine
         Check2Fix-Header
         Show-Menu -Title "My Case Tracker $Current_Version"
-        write-host "Note. You can add a case id directly from main menu."
+        Write-Host "Note. You can add a case id directly from main menu."
         Write-Host ""
         $UserInput = ((Read-Host "Make selection/Input case ID").trim()) -replace "\r?\n", " "
         switch($UserInput)
@@ -267,7 +267,7 @@ function Prompt-Confirm{
 
 
 function New-Csv{
-    write-host "CSV is not created, creating..."
+    Write-Host "CSV is not created, creating..."
 
     # Create csv file 
     $NewExcel = New-Object -ComObject Excel.Application
@@ -288,8 +288,8 @@ function New-Csv{
     # Save the file
     try{
         $NewWorkbook.SaveAs("$filePath",[Microsoft.Office.Interop.Excel.XlFileFormat]::xlCSV) # xlCSV specifies the CSV file format
-        write-host "CSV is created, the path is:"
-        write-host $File -ForegroundColor Cyan
+        Write-Host "CSV is created, the path is:"
+        Write-Host $File -ForegroundColor Cyan
         Write-Warning "Do not change the CSV file path/column names, or you have to modify the path/column in scripts!"
     }
     catch{$e}
@@ -359,7 +359,7 @@ function Add-Case{
     }
 
     $case.content = $case.date, $case.time, $case.case, $case.type, $case.note -join ','
-    write-host ""
+    Write-Host ""
     try{
         Transmit-Case -case $case
         if(!$case.note){
@@ -417,7 +417,7 @@ function View-DailyWork{
 
     # Summary
     $TodayReview | Format-Table -Property Date, Score, Written, Chat, Phone -AutoSize -Wrap
-    Write-host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target"
+    Write-Host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target"
     Display-Details -table $TodayWork
 }
 
@@ -476,7 +476,7 @@ function View-MonthlyWork{
 
     # Summary
     $MonthReview | Format-Table -Property Date, Days, AvgScore, Written, Chat, Phone -AutoSize -Wrap 
-    Write-host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target/Record Days"
+    Write-Host "How Score counts:  Score = (Written + Chat + Phone)/Daily Target/Record Days"
     Display-Details -table $MonthWork
 }
 
@@ -492,14 +492,14 @@ function View-AllWork{
 function Display-Details{
     param($table)
 
-    write-host ""
+    Write-Host ""
     $decision = Prompt-Confirm -action 'display work details'
     if ($decision -eq 'y'){
         # $table | Format-Table -AutoSize
         $table | Out-GridView
     }
     else{
-        write-host "Cancelled,back to main menu."
+        Write-Host "Cancelled,back to main menu."
     }
 }
 
@@ -522,7 +522,7 @@ function Remove-SpecificCase{
     $FileContent = Get-Content -path $File
 
     if($FileContent){
-        write-host ""
+        Write-Host ""
 
         # user input case id
         [Bool]$CasePass = $false
@@ -560,7 +560,7 @@ function Remove-SpecificCase{
         Write-Host "Removed $CaseNeedsDelete Success" -f Cyan
     }
     else{
-        write-host ""
+        Write-Host ""
         Write-Host "Message: The CSV does not contain any records."
     }
 }
@@ -619,9 +619,9 @@ Try{
     Start-Menu # -ErrorAction SilentlyContinue
 }
 Catch {
-    write-host ""
+    Write-Host ""
     Write-Warning "Oops,seems an error occurred, please check CSV file and download the latest version of script.`n"
-    write-host "You can download latest version from here: `nhttps://git.build.ingka.ikea.com/LEJIA3/My-Case-Tracker`n"
+    Write-Host "You can download latest version from here: `nhttps://github.com/lischen2014/My-Case-Tracker`n"
     $decision = Prompt-Confirm -action 'show error details?'
     if ($decision -eq 'y'){
         $ErrLine = $_.ScriptStackTrace
