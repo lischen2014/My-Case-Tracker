@@ -67,7 +67,7 @@ $UpdateHistory =@"
     Releases: https://github.com/lischen2014/My-Case-Tracker
 
                                                    Author: Leon
-                                                   Email: leon2014@vip.qq.com
+                                                   Email: linchen2014@foxmail.com
 ======================================= End =======================================
 
 "@
@@ -620,9 +620,3 @@ Catch {
         Write-Warning "`nLocation: `n$ErrLine`nType: `n$ErrType`nDetail:`n$ErrDetail"
     }
 }
-
-
-
-# Reference:
-# http://woshub.com/read-write-excel-files-powershell/
-# https://stackoverflow.com/questions/59402365/update-a-cell-in-a-excel-sheet-using-powershell
